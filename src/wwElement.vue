@@ -1251,6 +1251,8 @@ export default {
             showDeleteAction: showDeleteAction.value,
             onEdit: handleNodeEdit,
             onDelete: handleNodeDelete,
+            stats: nodeStatsMap.value[node?.id] || null,
+            onStatsClick: handleStatsClick,
           },
         };
       });
@@ -1481,6 +1483,8 @@ export default {
           showDeleteAction: showDeleteAction.value,
           onEdit: handleNodeEdit,
           onDelete: handleNodeDelete,
+          stats: existingNode.data?.stats || null,
+          onStatsClick: handleStatsClick,
         },
       };
 
@@ -1522,6 +1526,8 @@ export default {
           showDeleteAction: showDeleteAction.value,
           onEdit: handleNodeEdit,
           onDelete: handleNodeDelete,
+          stats: null,
+          onStatsClick: handleStatsClick,
         },
       };
 
@@ -1766,12 +1772,21 @@ export default {
         }
       }, 300);
 
-      setTimeout(() => fetchNodeStats(), 500);
-
-      const statsInterval = setInterval(() => fetchNodeStats(), 30000);
-      const cleanup = () => clearInterval(statsInterval);
-      if (typeof window !== 'undefined') window.addEventListener('beforeunload', cleanup);
     });
+
+    // Fetch node stats when workflow ID is available, poll every 30s
+    let statsInterval = null;
+    watch(
+      () => props.content?.initialWorkflow?.id,
+      (wfId) => {
+        if (statsInterval) clearInterval(statsInterval);
+        if (wfId && supabaseUrlData.value && authTokenData.value) {
+          setTimeout(() => fetchNodeStats(), 200);
+          statsInterval = setInterval(() => fetchNodeStats(), 30000);
+        }
+      },
+      { immediate: true }
+    );
 
     // Watch nodes array and fit view
     watch(
