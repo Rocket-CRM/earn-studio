@@ -26,6 +26,7 @@ export default {
       'collections',
       'channels',
       'messageTemplates',
+      'actionOptions',
     ],
   },
   actions: [
@@ -502,6 +503,24 @@ export default {
       },
       propertyHelp:
         'Used by Message node config panel for template selection. Each template should have id, name, channel, and content.',
+      /* wwEditor:end */
+    },
+    actionOptions: {
+      label: { en: 'Action Options' },
+      type: 'Info',
+      section: 'settings',
+      options: {
+        text: { en: 'Bind result of bff_get_amp_action_options' },
+      },
+      bindable: true,
+      defaultValue: {},
+      /* wwEditor:start */
+      bindingValidation: {
+        type: 'object',
+        tooltip: 'Object from bff_get_amp_action_options: {ticket_types, tags, personas, forms}. Each form includes fields array.',
+      },
+      propertyHelp:
+        'Used by Action node config panel. Bind to the result of bff_get_amp_action_options RPC call. Contains ticket_types, tags, personas, and forms with their fields.',
       /* wwEditor:end */
     },
 

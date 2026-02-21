@@ -97,12 +97,13 @@
             :config="editingConfig"
             @update="handleConfigUpdate"
           />
-          <ActionConfig
-            v-else-if="editingNodeType === 'action'"
-            :config="editingConfig"
-            :channels="channelsData"
-            @update="handleConfigUpdate"
-          />
+        <ActionConfig
+          v-else-if="editingNodeType === 'action'"
+          :config="editingConfig"
+          :action-options="actionOptionsData"
+          :channels="channelsData"
+          @update="handleConfigUpdate"
+        />
           <AgentConfig
             v-else-if="editingNodeType === 'agent'"
             :config="editingConfig"
@@ -745,6 +746,7 @@ export default {
       { value: 'push', label: 'Push Notification' },
     ]);
     const messageTemplatesData = computed(() => props.content?.messageTemplates || []);
+    const actionOptionsData = computed(() => props.content?.actionOptions || {});
     const configPanelWidth = computed(() => props.content?.configPanelWidth || '360px');
     const configPanelStyle = computed(() => ({ width: configPanelWidth.value }));
     const configValidationErrorsList = computed(() => configValidationErrors.value || []);
@@ -843,12 +845,18 @@ export default {
         if (!config?.url) errors.push('URL is required');
       } else if (nodeType === 'action') {
         if (!config?.action_type) errors.push('Action type is required');
-        if (config?.action_type === 'award_points' && (!config?.amount || config.amount <= 0)) errors.push('Amount must be greater than 0');
-        if (config?.action_type === 'assign_tag' && !config?.tag_id) errors.push('Tag ID is required');
-        if (config?.action_type === 'send_message') {
-          if (!config?.channel) errors.push('Channel is required');
-          if (!config?.message) errors.push('Message content is required');
+        const at = config?.action_type;
+        if (at === 'award_currency') {
+          if (!config?.amount || config.amount <= 0) errors.push('Amount must be greater than 0');
+          if (config?.currency === 'ticket' && !config?.ticket_type_id) errors.push('Ticket type is required');
         }
+        if ((at === 'assign_tag' || at === 'remove_tag') && !config?.tag_id) errors.push('Tag is required');
+        if (at === 'assign_persona' && !config?.persona_id) errors.push('Persona is required');
+        if (at === 'submit_form' && !config?.form_id) errors.push('Form template is required');
+        if (at === 'send_line' && !config?.content) errors.push('Message content is required');
+        if (at === 'send_sms' && !config?.message) errors.push('Message is required');
+        if (at === 'api_call' && !config?.url) errors.push('URL is required');
+        if (at === 'agent_decision' && !config?.campaign_objective) errors.push('Campaign objective is required');
       } else if (nodeType === 'agent') {
         if (!config?.campaign_objective) errors.push('Campaign objective is required');
       }
@@ -984,7 +992,6 @@ export default {
         action: {
           label: 'New Action',
           action_type: null,
-          message: '',
         },
         message: {
           label: 'New Message',
@@ -1724,6 +1731,7 @@ export default {
       collectionsData,
       channelsData,
       messageTemplatesData,
+      actionOptionsData,
       configValidationErrorsList,
       handleConfigUpdate,
       markConfigChanged,
