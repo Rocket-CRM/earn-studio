@@ -15,11 +15,10 @@
               :key="g?.id"
               :group="g"
               :factors="factorsByGroup[g?.id] || []"
-              :expanded="expandedLeft[g?.id] !== false"
-              @toggle-expand="id => { expandedLeft[id] = expandedLeft[id] === false ? true : false; scheduleLineUpdate(); }"
               @add-factor="handleAddFactor"
               @edit-group="handleEditFactorGroup"
               @edit-factor="handleEditFactor"
+              @connect-factor="handleConnectFactor"
               @factor-ref="registerFactorRef"
             />
             <div v-if="!factorGroups?.length" class="earn-studio__empty">No earn factor groups yet.</div>
@@ -401,7 +400,7 @@ export default {
   &__col-body {
     display: flex;
     flex-direction: column;
-    gap: var(--p-space-600);
+    gap: var(--p-space-400);
   }
 
   &__svg {
