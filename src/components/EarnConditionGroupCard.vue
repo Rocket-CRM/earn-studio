@@ -2,7 +2,7 @@
   <div
     class="ec-pill"
     :class="{ 'ec-pill--active': isActive }"
-    :ref="el => $emit('pill-ref', { groupId: group?.id, displayKey, el })"
+    v-bind="$attrs"
     @click="$emit('select-group', group, displayKey)"
   >
     <div class="ec-pill__dot"></div>
@@ -91,7 +91,8 @@ export default {
     isActive: { type: Boolean, default: false },
     displayKey: { type: String, default: '' },
   },
-  emits: ['select-group', 'add-condition', 'edit-group', 'pill-ref'],
+  inheritAttrs: false,
+  emits: ['select-group', 'add-condition', 'edit-group'],
   setup(props) {
     const conditionCount = computed(() => props.conditions?.length || 0);
 
