@@ -121,19 +121,19 @@
         Add another earn condition
       </button>
 
-      <div v-if="!isNew" class="config-panel__delete-section">
-        <button class="config-panel__delete-link" @click="showDeleteConfirm = true">
-          <svg width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M6 6h8v10H6V6zM4 6h12M8 4h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Delete
-        </button>
-      </div>
     </div>
 
     <div class="config-panel__footer">
-      <button class="config-panel__btn-secondary" @click="$emit('close')">Cancel</button>
-      <button class="config-panel__btn-primary" @click="handleSave" :disabled="saving">
-        {{ saving ? 'Saving...' : 'Save' }}
+      <button v-if="!isNew" class="config-panel__delete-link" @click="showDeleteConfirm = true">
+        <svg width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M6 6h8v10H6V6zM4 6h12M8 4h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Delete
       </button>
+      <div class="config-panel__footer-actions">
+        <button class="config-panel__btn-secondary" @click="$emit('close')">Cancel</button>
+        <button class="config-panel__btn-primary" @click="handleSave" :disabled="saving">
+          {{ saving ? 'Saving...' : 'Save' }}
+        </button>
+      </div>
     </div>
 
     <div v-if="entityPickerOpen" class="entity-picker-overlay" @click.self="entityPickerOpen = false">
@@ -444,7 +444,12 @@ export default {
     @include polaris-radio-wrapper; font-size: var(--p-font-size-350);
     input[type="radio"] { @include polaris-radio; box-sizing: border-box; }
   }
-  &__footer { @include polaris-modal-footer; }
+  &__footer {
+    @include polaris-modal-footer;
+    justify-content: space-between;
+    align-items: center;
+  }
+  &__footer-actions { display: flex; gap: var(--p-space-200); margin-left: auto; }
   &__btn-primary { @include polaris-button-primary; }
   &__btn-secondary { @include polaris-button-default; }
   &__delete-link { @include polaris-link-destructive; }
@@ -453,12 +458,6 @@ export default {
     @include polaris-button-critical;
     font-size: var(--p-font-size-350);
     gap: 6px;
-  }
-
-  &__delete-section {
-    margin-top: var(--p-space-200);
-    padding-top: var(--p-space-400);
-    border-top: 1px solid var(--p-color-border);
   }
 
   &__section-title {

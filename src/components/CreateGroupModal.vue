@@ -37,19 +37,19 @@
           </div>
         </template>
 
-        <div v-if="isEdit" class="modal__delete-section">
-          <button class="modal__delete-link" @click="showDeleteConfirm = true">
-            <svg width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M6 6h8v10H6V6zM4 6h12M8 4h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            Delete
-          </button>
-        </div>
       </div>
 
       <div class="modal__footer">
-        <button class="modal__btn-secondary" @click="$emit('close')">Cancel</button>
-        <button class="modal__btn-primary" @click="handleSave" :disabled="saving || !form.name?.trim()">
-          {{ saving ? (isEdit ? 'Saving...' : 'Creating...') : (isEdit ? 'Save' : 'Create') }}
+        <button v-if="isEdit" class="modal__delete-link" @click="showDeleteConfirm = true">
+          <svg width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M6 6h8v10H6V6zM4 6h12M8 4h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Delete
         </button>
+        <div class="modal__footer-actions">
+          <button class="modal__btn-secondary" @click="$emit('close')">Cancel</button>
+          <button class="modal__btn-primary" @click="handleSave" :disabled="saving || !form.name?.trim()">
+            {{ saving ? (isEdit ? 'Saving...' : 'Creating...') : (isEdit ? 'Save' : 'Create') }}
+          </button>
+        </div>
       </div>
     </div>
 
@@ -189,7 +189,12 @@ export default {
   &__switch-wrapper { @include polaris-switch-wrapper; }
   &__switch { @include polaris-switch; }
   &__switch-label { @include polaris-text-body; }
-  &__footer { @include polaris-modal-footer; }
+  &__footer {
+    @include polaris-modal-footer;
+    justify-content: space-between;
+    align-items: center;
+  }
+  &__footer-actions { display: flex; gap: var(--p-space-200); margin-left: auto; }
   &__btn-primary { @include polaris-button-primary; }
   &__btn-secondary { @include polaris-button-default; }
   &__delete-link { @include polaris-link-destructive; }
@@ -197,12 +202,6 @@ export default {
     @include polaris-button-critical;
     font-size: var(--p-font-size-350);
     gap: 6px;
-  }
-
-  &__delete-section {
-    margin-top: var(--p-space-200);
-    padding-top: var(--p-space-400);
-    border-top: 1px solid var(--p-color-border);
   }
 
   &__confirm-overlay {

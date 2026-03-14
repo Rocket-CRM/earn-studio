@@ -80,17 +80,17 @@
         </select>
       </div>
 
-      <div v-if="!isNew" class="sidebar__delete-section">
-        <button class="sidebar__delete-link" @click="showDeleteConfirm = true">
-          <svg width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M6 6h8v10H6V6zM4 6h12M8 4h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Delete
-        </button>
-      </div>
     </div>
 
     <div class="sidebar__foot">
-      <button class="sidebar__btn sidebar__btn--secondary" @click="$emit('close')">Cancel</button>
-      <button class="sidebar__btn sidebar__btn--primary" @click="handleSave" :disabled="saving">{{ saving ? 'Saving...' : 'Save' }}</button>
+      <button v-if="!isNew" class="sidebar__delete-link" @click="showDeleteConfirm = true">
+        <svg width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M6 6h8v10H6V6zM4 6h12M8 4h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Delete
+      </button>
+      <div class="sidebar__foot-actions">
+        <button class="sidebar__btn sidebar__btn--secondary" @click="$emit('close')">Cancel</button>
+        <button class="sidebar__btn sidebar__btn--primary" @click="handleSave" :disabled="saving">{{ saving ? 'Saving...' : 'Save' }}</button>
+      </div>
     </div>
 
     <div v-if="showDeleteConfirm" class="sidebar__confirm-overlay" @click.self="showDeleteConfirm = false">
@@ -271,15 +271,14 @@ export default {
     input[type="radio"] { @include polaris-radio; box-sizing: border-box; }
   }
 
-  &__delete-section {
-    margin-top: var(--p-space-200);
-    padding-top: var(--p-space-400);
-    border-top: 1px solid var(--p-color-border);
-  }
-
   &__delete-link { @include polaris-link-destructive; }
 
-  &__foot { @include polaris-modal-footer; }
+  &__foot {
+    @include polaris-modal-footer;
+    justify-content: space-between;
+    align-items: center;
+  }
+  &__foot-actions { display: flex; gap: var(--p-space-200); margin-left: auto; }
   &__btn {
     &--primary { @include polaris-button-primary; }
     &--secondary { @include polaris-button-default; }
