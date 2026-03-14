@@ -41,13 +41,15 @@ The component renders as a group-row based layout with SVG bezier connection lin
 
 **Key layout decisions:**
 
-- **Page header** — bindable title + description on the left; search/filter controls aligned right (same row to save space)
+- **Page header** — bindable title + description on the left; search/filter controls + consolidated Create dropdown aligned right (same row to save space); separated from content by a subtle border-bottom
 - **Search & filter bar** — two search inputs (factor group name, condition group name) + earn factor type dropdown (base rate / multiplier)
+- **Create dropdown** — single "Create ▾" primary button with hover dropdown menu offering "Earn Factor Group" and "Earn Condition Group" options
+- **Column labels** — small uppercase grey labels (`EARN FACTOR GROUP` / `EARN CONDITIONS GROUP`) act as table column headers, not competing H2 titles
 - **Scroll area wrapper** — `.es__scroll-area` wraps all scrollable content; config panels/backdrop are siblings outside it for proper overlay
 - **Group-row layout** — each earn factor group renders as a full-width row: sidebar panel on the left + factor cards + right column condition slots
-- **Group sidebar panel (160px)** — colored 4px internal accent strip, group name (wrapping text), add (+) and edit (✏) icon buttons, `min-height: 60px` matching card height
+- **Group sidebar panel (160px)** — white background, blue border, rounded corners, shadow (unified with card styling); colored 4px accent strip; action icons (add/edit) appear on hover only for clean interface
 - **Factor cards (60px fixed height)** — tag icon for rate, lightning bolt icon for multiplier; rate shows `฿{amount}`, multiplier shows `{amount}x`
-- **Condition cards expandable** — chevron toggle + edit icon; expands to show conditions table inside a bordered container (8px radius, `#EBEDEF` border). Both factor and condition cards share the same blue border (`--p-color-border-info`) with subtle shadow; hover thickens border to 1.5px with elevated shadow
+- **Condition cards expandable** — chevron toggle + edit icon; expands to show conditions table inside a bordered container (8px radius, `#EBEDEF` border). All cards (factor, condition, sidebar) share the same blue border (`--p-color-border-info`) with subtle shadow; hover thickens border to 1.5px with elevated shadow
 - **Condition detail table** — `table-layout: fixed` with Figma column widths (Type 91px, Items 64px, Logic 70px, Threshold type 165px, Excess fill); pink `#F7E6EF`/`#DA3590` item badges with eye icon; NoteIcon for threshold; cell borders `#EEEEEE`
 - **Link badge** — chain-link SVG icon with linked factor count
 - **Linked groups at top** — groups with at least one condition-linked factor appear first
@@ -289,7 +291,9 @@ No page-level save. Each entity saves independently:
 - Condition group icon: filter/lines (descending horizontal bars)
 - Condition detail table: bordered 8px-radius container, pink item badges with eye icon, NoteIcon for threshold, `#EEEEEE` cell borders
 - Config panels: absolute positioning overlay with 30% opacity backdrop
-- Card borders: unified blue (`--p-color-border-info`) for both factor and condition cards; hover thickens to 1.5px with shadow elevation; dim/unlinked cards use grey border, restore blue on hover
+- Card borders: unified blue (`--p-color-border-info`) for all cards including group sidebar; hover thickens to 1.5px with shadow elevation; dim/unlinked cards use grey border, restore blue on hover
+- Group sidebar: unified with card design (white bg, blue border, shadow); action icons hidden by default, appear on hover
+- Create dropdown: single consolidated button with hover menu instead of two separate Create buttons
 
 ---
 
