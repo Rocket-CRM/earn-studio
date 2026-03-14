@@ -535,6 +535,8 @@ $right-width: 480px;
     display: flex; align-items: flex-start; justify-content: space-between;
     padding: var(--p-space-500) 0 var(--p-space-400);
     gap: 24px;
+    border-bottom: 1px solid var(--p-color-border);
+    margin-bottom: var(--p-space-300);
   }
   &__page-header-left { flex-shrink: 0; }
   &__page-title {
