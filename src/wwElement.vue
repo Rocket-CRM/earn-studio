@@ -20,13 +20,16 @@
         <div v-for="entry in linkedGroupEntries" :key="entry.group.id" class="es__group-row">
           <div class="es__group-left">
             <div class="es__group-sidebar" :style="sidebarStyle(entry.group.id)">
-              <div class="es__sidebar-icon" :style="{ background: getGroupColor(entry.group.id) }">
-                <svg width="12" height="12" viewBox="0 0 20 20" fill="none"><rect x="2" y="4" width="7" height="5" rx="1" fill="#fff" opacity=".8"/><rect x="2" y="11" width="7" height="5" rx="1" fill="#fff" opacity=".6"/><rect x="11" y="4" width="7" height="5" rx="1" fill="#fff" opacity=".4"/><rect x="11" y="11" width="7" height="5" rx="1" fill="#fff" opacity=".3"/></svg>
-              </div>
-              <span class="es__sidebar-name">{{ entry.group.name || 'Untitled Group' }}</span>
-              <div class="es__sidebar-actions">
-                <button class="es__sidebar-btn" @click="handleAddFactor(entry.group.id)">+ Add</button>
-                <button class="es__sidebar-edit" @click="handleEditFactorGroup()">
+              <div class="es__sidebar-accent" :style="{ background: getGroupColor(entry.group.id) }"></div>
+              <div class="es__sidebar-inner">
+                <div class="es__sidebar-icon" :style="{ background: getGroupColor(entry.group.id) }">
+                  <svg width="12" height="12" viewBox="0 0 20 20" fill="none"><rect x="2" y="4" width="7" height="5" rx="1" fill="#fff" opacity=".8"/><rect x="2" y="11" width="7" height="5" rx="1" fill="#fff" opacity=".6"/><rect x="11" y="4" width="7" height="5" rx="1" fill="#fff" opacity=".4"/><rect x="11" y="11" width="7" height="5" rx="1" fill="#fff" opacity=".3"/></svg>
+                </div>
+                <span class="es__sidebar-name">{{ entry.group.name || 'Untitled Group' }}</span>
+                <button class="es__sidebar-action" @click="handleAddFactor(entry.group.id)" title="Add earn factor">
+                  <svg width="12" height="12" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+                </button>
+                <button class="es__sidebar-action" @click="handleEditFactorGroup()" title="Edit group">
                   <svg width="12" height="12" viewBox="0 0 20 20" fill="none"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" fill="currentColor"/></svg>
                 </button>
               </div>
@@ -89,21 +92,25 @@
           </div>
         </div>
 
-        <!-- ═══ UNLINKED SECTION (bottom, two-column) ═══ -->
+        <!-- ═══ UNLINKED SECTION ═══ -->
         <template v-if="hasUnlinkedSection">
           <div class="es__divider"><span>Unlinked</span></div>
           <div class="es__unlinked-row">
-            <!-- Left: groups with unlinked factors + empty groups as chips -->
+            <!-- Left: unlinked groups (with factors + empty) -->
             <div class="es__unlinked-left">
+              <!-- Groups with unlinked factors -->
               <div v-for="entry in unlinkedGroupsWithFactors" :key="entry.group.id" class="es__unlinked-group">
                 <div class="es__group-sidebar" :style="sidebarStyle(entry.group.id)">
-                  <div class="es__sidebar-icon" :style="{ background: getGroupColor(entry.group.id) }">
-                    <svg width="12" height="12" viewBox="0 0 20 20" fill="none"><rect x="2" y="4" width="7" height="5" rx="1" fill="#fff" opacity=".8"/><rect x="2" y="11" width="7" height="5" rx="1" fill="#fff" opacity=".6"/><rect x="11" y="4" width="7" height="5" rx="1" fill="#fff" opacity=".4"/><rect x="11" y="11" width="7" height="5" rx="1" fill="#fff" opacity=".3"/></svg>
-                  </div>
-                  <span class="es__sidebar-name">{{ entry.group.name || 'Untitled Group' }}</span>
-                  <div class="es__sidebar-actions">
-                    <button class="es__sidebar-btn" @click="handleAddFactor(entry.group.id)">+ Add</button>
-                    <button class="es__sidebar-edit" @click="handleEditFactorGroup()">
+                  <div class="es__sidebar-accent" :style="{ background: getGroupColor(entry.group.id) }"></div>
+                  <div class="es__sidebar-inner">
+                    <div class="es__sidebar-icon" :style="{ background: getGroupColor(entry.group.id) }">
+                      <svg width="12" height="12" viewBox="0 0 20 20" fill="none"><rect x="2" y="4" width="7" height="5" rx="1" fill="#fff" opacity=".8"/><rect x="2" y="11" width="7" height="5" rx="1" fill="#fff" opacity=".6"/><rect x="11" y="4" width="7" height="5" rx="1" fill="#fff" opacity=".4"/><rect x="11" y="11" width="7" height="5" rx="1" fill="#fff" opacity=".3"/></svg>
+                    </div>
+                    <span class="es__sidebar-name">{{ entry.group.name || 'Untitled Group' }}</span>
+                    <button class="es__sidebar-action" @click="handleAddFactor(entry.group.id)" title="Add earn factor">
+                      <svg width="12" height="12" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+                    </button>
+                    <button class="es__sidebar-action" @click="handleEditFactorGroup()" title="Edit group">
                       <svg width="12" height="12" viewBox="0 0 20 20" fill="none"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" fill="currentColor"/></svg>
                     </button>
                   </div>
@@ -134,18 +141,22 @@
                 </div>
               </div>
 
-              <!-- Empty groups as compact chips -->
-              <div v-if="emptyGroups.length" class="es__empty-chips">
-                <div v-for="entry in emptyGroups" :key="entry.group.id"
-                  class="es__chip" :style="{ borderLeftColor: getGroupColor(entry.group.id) }">
-                  <div class="es__chip-icon" :style="{ background: getGroupColor(entry.group.id) }">
-                    <svg width="9" height="9" viewBox="0 0 20 20" fill="none"><rect x="2" y="4" width="7" height="5" rx="1" fill="#fff" opacity=".8"/><rect x="2" y="11" width="7" height="5" rx="1" fill="#fff" opacity=".6"/><rect x="11" y="4" width="7" height="5" rx="1" fill="#fff" opacity=".4"/><rect x="11" y="11" width="7" height="5" rx="1" fill="#fff" opacity=".3"/></svg>
+              <!-- Empty groups listed like the others (sidebar only, no cards) -->
+              <div v-for="entry in emptyGroups" :key="entry.group.id" class="es__unlinked-group es__unlinked-group--empty">
+                <div class="es__group-sidebar" :style="sidebarStyle(entry.group.id)">
+                  <div class="es__sidebar-accent" :style="{ background: getGroupColor(entry.group.id) }"></div>
+                  <div class="es__sidebar-inner">
+                    <div class="es__sidebar-icon" :style="{ background: getGroupColor(entry.group.id) }">
+                      <svg width="12" height="12" viewBox="0 0 20 20" fill="none"><rect x="2" y="4" width="7" height="5" rx="1" fill="#fff" opacity=".8"/><rect x="2" y="11" width="7" height="5" rx="1" fill="#fff" opacity=".6"/><rect x="11" y="4" width="7" height="5" rx="1" fill="#fff" opacity=".4"/><rect x="11" y="11" width="7" height="5" rx="1" fill="#fff" opacity=".3"/></svg>
+                    </div>
+                    <span class="es__sidebar-name">{{ entry.group.name || 'Untitled Group' }}</span>
+                    <button class="es__sidebar-action" @click="handleAddFactor(entry.group.id)" title="Add earn factor">
+                      <svg width="12" height="12" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+                    </button>
+                    <button class="es__sidebar-action" @click="handleEditFactorGroup()" title="Edit group">
+                      <svg width="12" height="12" viewBox="0 0 20 20" fill="none"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" fill="currentColor"/></svg>
+                    </button>
                   </div>
-                  <span class="es__chip-name">{{ entry.group.name || 'Untitled Group' }}</span>
-                  <button class="es__chip-btn" @click="handleAddFactor(entry.group.id)">+ Add</button>
-                  <button class="es__chip-edit" @click="handleEditFactorGroup()">
-                    <svg width="10" height="10" viewBox="0 0 20 20" fill="none"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" fill="currentColor"/></svg>
-                  </button>
                 </div>
               </div>
             </div>
@@ -261,7 +272,7 @@ export default {
     function getGroupColor(gid) { return GROUP_COLORS[hashStr(gid) % GROUP_COLORS.length]; }
     function getGroupName(gid) { return groupNameMap.value[gid] || 'Unknown Group'; }
     function cgIconStyle(gid) { const c = getGroupColor(gid); return { background: `${c}12`, color: c }; }
-    function sidebarStyle(gid) { const c = getGroupColor(gid); return { borderLeftColor: c, background: `${c}08` }; }
+    function sidebarStyle(gid) { const c = getGroupColor(gid); return { background: `${c}06` }; }
 
     const groupedEntries = computed(() => {
       const condGroups = allCondGroups.value || [];
@@ -422,7 +433,7 @@ export default {
 @import 'polaris-weweb-styles';
 
 $card-height: 60px;
-$sidebar-width: 100px;
+$sidebar-width: 140px;
 $left-width: 520px;
 $right-width: 480px;
 
@@ -446,7 +457,7 @@ $right-width: 480px;
   &__title { @include polaris-text-title; margin: 0; }
   &__primary-btn { @include polaris-button-primary; @include polaris-button-slim; font-size: var(--p-font-size-300); }
 
-  // ─── Group row (linked groups — full two-column) ───
+  // ─── Group row ───
   &__group-row {
     display: flex; justify-content: space-between; align-items: flex-start;
     margin-bottom: var(--p-space-500);
@@ -461,41 +472,46 @@ $right-width: 480px;
   // ─── Group sidebar panel ───
   &__group-sidebar {
     width: $sidebar-width; flex-shrink: 0;
-    padding: 10px;
-    background: var(--p-color-bg-surface);
+    min-height: $card-height;
+    display: flex; align-items: stretch;
     border: 1px solid var(--p-color-border);
-    border-left-width: 3px;
     border-radius: var(--p-border-radius-200);
-    display: flex; flex-direction: column;
-    gap: 4px;
+    overflow: hidden;
   }
+
+  &__sidebar-accent {
+    width: 4px; min-width: 4px;
+  }
+
+  &__sidebar-inner {
+    flex: 1;
+    padding: 8px 8px 8px 10px;
+    display: flex; align-items: center; gap: 6px;
+    align-self: flex-start;
+  }
+
   &__sidebar-icon {
-    width: 24px; height: 24px; border-radius: 5px;
+    width: 24px; height: 24px; min-width: 24px; border-radius: 5px;
     display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;
   }
+
   &__sidebar-name {
+    flex: 1; min-width: 0;
     font-size: 12px; line-height: 1.3;
     font-weight: var(--p-font-weight-semibold);
     color: var(--p-color-text);
-    word-break: break-word;
-    flex: 1;
-  }
-  &__sidebar-actions {
-    display: flex; align-items: center; gap: 2px;
-    margin-top: auto; padding-top: 4px;
-  }
-  &__sidebar-btn {
-    @include polaris-button-plain;
-    font-size: 11px; padding: 2px 4px; min-height: auto;
+    overflow: hidden; text-overflow: ellipsis;
     white-space: nowrap;
   }
-  &__sidebar-edit {
+
+  &__sidebar-action {
     width: 22px; height: 22px; min-width: 22px;
     display: flex; align-items: center; justify-content: center;
     background: none; border: none; border-radius: var(--p-border-radius-100);
-    color: var(--p-color-icon); cursor: pointer;
-    &:hover { background: var(--p-color-bg-fill-transparent-hover); }
+    color: var(--p-color-icon); cursor: pointer; flex-shrink: 0;
+    opacity: 0.5; transition: opacity 0.1s, background 0.1s;
+    &:hover { opacity: 1; background: var(--p-color-bg-fill-transparent-hover); }
   }
 
   // ─── Factor cards column ───
@@ -522,52 +538,17 @@ $right-width: 480px;
   }
   &__unlinked-left {
     width: $left-width; flex-shrink: 0;
-    display: flex; flex-direction: column; gap: 12px;
+    display: flex; flex-direction: column; gap: 8px;
   }
   &__unlinked-group {
     display: flex; align-items: stretch; gap: 10px;
     opacity: 0.7; transition: opacity 0.15s;
     &:hover { opacity: 1; }
+    &--empty { opacity: 0.5; }
   }
   &__unlinked-right {
     width: $right-width; flex-shrink: 0;
     display: flex; flex-direction: column; gap: var(--p-space-200);
-  }
-
-  // ─── Empty group chips ───
-  &__empty-chips {
-    display: flex; flex-wrap: wrap; gap: 6px;
-    padding-top: 4px;
-  }
-  &__chip {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 5px 8px;
-    background: var(--p-color-bg-surface);
-    border: 1px solid var(--p-color-border);
-    border-left-width: 3px;
-    border-radius: var(--p-border-radius-200);
-    opacity: 0.65; transition: opacity 0.15s;
-    &:hover { opacity: 1; }
-  }
-  &__chip-icon {
-    width: 16px; height: 16px; min-width: 16px; border-radius: 3px;
-    display: flex; align-items: center; justify-content: center;
-  }
-  &__chip-name {
-    font-size: 11px; font-weight: var(--p-font-weight-semibold);
-    color: var(--p-color-text-secondary);
-    max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-  }
-  &__chip-btn {
-    @include polaris-button-plain;
-    font-size: 10px; padding: 1px 3px; min-height: auto; white-space: nowrap;
-  }
-  &__chip-edit {
-    width: 18px; height: 18px; min-width: 18px;
-    display: flex; align-items: center; justify-content: center;
-    background: none; border: none; border-radius: 3px;
-    color: var(--p-color-icon); cursor: pointer;
-    &:hover { background: var(--p-color-bg-fill-transparent-hover); }
   }
 
   // ─── Unified card ───
