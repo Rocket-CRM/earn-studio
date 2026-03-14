@@ -17,38 +17,61 @@ The component renders as a group-row based layout with SVG bezier connection lin
 ### Layout Design
 
 ```
-LEFT (560px)                                              RIGHT (480px)
-┌────────────┐ ┌──────────────────────────────┐           ┌────────────────────────────────────┐
-│▌           │ │ 🏷 Points Starter Rules ฿100  │ ─bezier─ │ ≡ Untitled Conditions Group    ∧   │
-│▌ Untitled  │ │    Points (Base rate)         │           │   2 conditions  🔗1                │
-│▌ Group     │ ├──────────────────────────────┤           │   Type  Items  Logic  Thresh  Excs │
-│▌      + ✏  │ │ ⚡ Points Power Boost    3x   │           │   SKU    1●    OR     -       No   │
-│▌           │ │    Points (Multiplier)        │           │   Brand  1●    OR     -       No   │
-└────────────┘ └──────────────────────────────┘           └────────────────────────────────────┘
-
-─── UNLINKED ──────────────────────
-
-LEFT: sidebar + cards (dimmed)                   RIGHT: unlinked condition groups
-┌────────────┐ ┌──────────────────┐              ┌──────────────────────────┐
-│▌ EFG 10... │ │ ⚡ Power Boost 2x │              │ ≡ Untitled  2 conditions │
-│▌      + ✏  │ └──────────────────┘              └──────────────────────────┘
-└────────────┘                                   ┌──────────────────────────┐
-┌────────────┐                                   │ ≡ aefawefawef 3 conds    │
-│▌ Empty Grp │ (no cards — sidebar only)         └──────────────────────────┘
-│▌      + ✏  │
-└────────────┘
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ Conditional Currency Multipliers              [🔍 factor] [🔍 cond] [▾ Type] │
+│ Configure reward multipliers based on...                                    │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ Earn factor group          [Create]    Earn Conditions group      [Create]  │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│ LEFT (560px)                                   RIGHT (480px)                │
+│ ┌────────────┐ ┌────────────────────┐          ┌───────────────────────────┐│
+│ │▌           │ │ 🏷 Points Rules ฿100│ ─bezier─ │ ≡ Tier Perks    ✏  ∧    ││
+│ │▌ Untitled  │ │   Points (Base)    │          │   2 conditions  🔗1      ││
+│ │▌ Group     │ ├────────────────────┤          │ ┌─────────────────────┐  ││
+│ │▌      + ✏  │ │ ⚡ Power Boost  3x  │          │ │Type│Items│Logic│Thr│Ex││
+│ │▌           │ │   Points (Mult)    │          │ │Tier│ 32● │ OR │Amt│Ye││
+│ └────────────┘ └────────────────────┘          │ │Prod│ 32● │ OR │Amt│No││
+│                                                │ └─────────────────────┘  ││
+│                                                └───────────────────────────┘│
+│─── UNLINKED ────────────────────────────────────────────────────────────────│
+│ LEFT: sidebar + cards (dimmed)          RIGHT: unlinked condition groups    │
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
 
 **Key layout decisions:**
 
+- **Page header** — bindable title + description on the left; search/filter controls aligned right (same row to save space)
+- **Search & filter bar** — two search inputs (factor group name, condition group name) + earn factor type dropdown (base rate / multiplier)
+- **Scroll area wrapper** — `.es__scroll-area` wraps all scrollable content; config panels/backdrop are siblings outside it for proper overlay
 - **Group-row layout** — each earn factor group renders as a full-width row: sidebar panel on the left + factor cards + right column condition slots
 - **Group sidebar panel (160px)** — colored 4px internal accent strip, group name (wrapping text), add (+) and edit (✏) icon buttons, `min-height: 60px` matching card height
 - **Factor cards (60px fixed height)** — tag icon for rate, lightning bolt icon for multiplier; rate shows `฿{amount}`, multiplier shows `{amount}x`
-- **Condition cards expandable** — chevron toggle expands to show conditions table (Type, Items, Logic, Threshold type, Excess); connection badge shows link icon + count
+- **Condition cards expandable** — chevron toggle + edit icon; expands to show conditions table inside a bordered container (8px radius, `#EBEDEF` border)
+- **Condition detail table** — `table-layout: fixed` with Figma column widths (Type 91px, Items 64px, Logic 70px, Threshold type 165px, Excess fill); pink `#F7E6EF`/`#DA3590` item badges with eye icon; NoteIcon for threshold; cell borders `#EEEEEE`
+- **Link badge** — chain-link SVG icon with linked factor count
 - **Linked groups at top** — groups with at least one condition-linked factor appear first
 - **Unlinked section at bottom** — two-column row: left has unlinked groups with factors (dimmed) + empty groups (sidebar only), right has unlinked condition groups
 - **SVG overlay** covers the full layout with `position: absolute`, `pointer-events: none`
 - **Connection lines** use bezier curves anchored to factor card center-right → condition header center-left (top: 30px for expanded cards)
+
+### Config Panel Overlay Pattern
+
+Config panels (EarnFactorConfig, EarnConditionGroupConfig) use **absolute positioning** within the `.es` root — NOT `position: fixed` (which breaks in WeWeb's iframe/transform context):
+
+```
+.es (position: relative, overflow: hidden)
+├── .es__scroll-area (overflow: auto, 100% height)
+│   ├── .es__page-header
+│   ├── .es__layout (main content + SVG)
+│   ├── CreateGroupModal
+│   └── ConnectPopup
+├── .es__panel-backdrop (position: absolute, 100% × 100%, z-index: 299)
+├── EarnFactorConfig (position: absolute, top/right/bottom: 0, z-index: 300)
+└── EarnConditionGroupConfig (position: absolute, top/right/bottom: 0, z-index: 300)
+```
+
+Backdrop renders directly with `v-if` (no Vue `<transition>` wrapper — unreliable in WeWeb runtime).
 
 ### Data Attribute DOM Query Pattern
 
@@ -64,14 +87,20 @@ Connection lines are drawn by querying the DOM directly:
 
 ### Working
 
+- Page header with bindable title/description and inline search/filter bar
+- Search filtering: factor group name search, condition group name search
+- Earn factor type filter: dropdown filters by rate or multiplier
 - Data loading: factor groups, factors per group, condition groups, condition details, entity options
 - Left column: group sidebar panel + factor cards per group, sorted (linked first, unlinked at bottom)
-- Right column: expandable condition group cards with conditions table, connection count badges
+- Right column: expandable condition group cards with conditions detail table, connection count badges
+- Edit icon on condition group cards (appears on hover)
 - Factor card icons: tag (rate) / lightning bolt (multiplier) with amount badges
-- Expandable condition groups: chevron toggle shows/hides conditions detail table
+- Expandable condition groups: chevron toggle shows/hides conditions detail table in bordered rounded container
+- Condition table: Figma-accurate column widths, pink item badges with eye icon, NoteIcon for threshold
 - Create Earn Factor Group modal (name, stackable, window dates)
-- Edit Earn Factor sidebar panel (all fields)
-- Edit Earn Condition Group sidebar panel (condition list with entity picker, operator toggle, thresholds)
+- Edit Earn Factor sidebar panel (all fields) — floating overlay with backdrop
+- Edit Earn Condition Group sidebar panel (condition list with entity picker, operator toggle, thresholds) — floating overlay with backdrop
+- Operator toggle: Figma-accurate pill-style segmented control using `polaris-segmented-pill` mixins (NOT polaris-button-primary which caused invisible white text)
 - Connect popup: "+" button on factor card hover → popup lists condition groups → select to link
 - Group ID injection: `bff_get_earn_factors_by_group` response doesn't include `earn_factor_group_id`, so it's injected from the query context
 - SVG bezier connection lines between factor cards and condition cards
@@ -79,17 +108,13 @@ Connection lines are drawn by querying the DOM directly:
 
 ### Known Issues (to fix in next iteration)
 
-1. ~~**Condition table styling**~~ — FIXED. Table now uses `table-layout: fixed` with Figma-accurate column widths (Type 91px, Items 64px, Logic 70px, Threshold type 165px, Excess fill). Items badge uses pink `#F7E6EF`/`#DA3590` pill with eye icon (ViewIcon). Threshold type shows NoteIcon. Header/cell borders use `#EEEEEE`.
+1. **SVG connection lines may not render in WeWeb editor** — `querySelector` with `data-*` attributes works in standard DOM but may fail in WeWeb's shadow DOM or iframe context.
 
-2. ~~**Config sidebar panel not floating**~~ — FIXED. Restructured DOM: scrollable content is inside `.es__scroll-area`, panels/backdrop are siblings positioned absolutely within `.es` root (avoids `position: fixed` containment issues from WeWeb wrapper transforms). Panels use `position: absolute; top:0; right:0; bottom:0` with semi-transparent backdrop overlay and slide transition.
+2. **Line rebuild timing** — `scheduleLineUpdate` fires at 150ms delay with 300ms/800ms retries. MutationObserver approach may be more reliable for large datasets.
 
-3. **SVG connection lines may not render in WeWeb editor** — `querySelector` with `data-*` attributes works in standard DOM but may fail in WeWeb's shadow DOM or iframe context.
+3. **EarnConditionGroupCard.vue and EarnFactorGroupCard.vue** in `/src/components/` are **dead code** — not imported by wwElement.vue.
 
-4. **Line rebuild timing** — `scheduleLineUpdate` fires at 150ms delay with 300ms/800ms retries. MutationObserver approach may be more reliable for large datasets.
-
-5. **EarnConditionGroupCard.vue and EarnFactorGroupCard.vue** in `/src/components/` are **dead code** — not imported by wwElement.vue.
-
-6. **No delete functionality in UI** — delete API functions exist in `useApi.js` but no UI buttons call them.
+4. **No delete functionality in UI** — delete API functions exist in `useApi.js` but no UI buttons call them.
 
 ---
 
@@ -100,17 +125,20 @@ earn-studio/
 ├── package.json                          # deps: polaris-weweb-styles (github), @weweb/cli
 ├── ww-config.js                          # WeWeb element config: props, actions, triggers
 ├── COMPONENT_SPEC.md                     # This file
+├── CURRENCY_KNOWLEDGE.md                 # Currency system reference (points, tickets, conditions)
 ├── README.md                             # Dev setup + gap tracking
 │
 └── src/
     ├── wwElement.vue                     # Main component — full rendering + state + API
+    │   - Page header: bindable title/description + search/filter bar
+    │   - Search: factor group name, condition group name
+    │   - Filter: earn factor type (rate/multiplier)
+    │   - Scroll area wrapper for content isolation
     │   - Group-row layout: sidebar + factor cards | condition slots
+    │   - Condition table in bordered 8px-radius container
     │   - SVG absolute overlay for bezier connection lines
     │   - DOM query: data-factor-id, data-cg-key
-    │   - Computed: linkedGroupEntries, unlinkedGroupsWithFactors, emptyGroups
-    │   - Expandable condition cards with conditions table
-    │   - Factor icons: tag (rate), lightning (multiplier)
-    │   - Connection count badges (link icon + number)
+    │   - Config panel overlay: absolute positioning + backdrop
     │   - 60px unified card height, 160px sidebar width
     │
     ├── useApi.js                         # Supabase RPC/REST API layer
@@ -123,13 +151,15 @@ earn-studio/
         ├── EarnFactorConfig.vue          # Sidebar: edit/create earn factor
         │   - Fields: name, type (rate/multiplier), amount, target currency,
         │     window start/end, expiry days, public/private, condition group dropdown
+        │   - position: absolute overlay within .es root
         │   - Save: emits { groupId, factor } → parent upserts
         │
         ├── EarnConditionGroupConfig.vue  # Sidebar: edit/create condition group
         │   - Group name field
         │   - Repeatable condition entries with entity type, entity multi-select,
-        │     operator toggle (OR/AND/EACH), threshold type, excess toggle, min/max
+        │     operator toggle (OR/AND/EACH using polaris-segmented-pill), threshold type, excess toggle, min/max
         │   - Entity picker modal with search + checkbox selection
+        │   - position: absolute overlay within .es root
         │
         ├── CreateGroupModal.vue          # Modal: create new earn factor group
         │   - Fields: name, stackable toggle, window start/end
@@ -187,6 +217,8 @@ m[g.id] = factors.map(f => ({ ...f, earn_factor_group_id: f.earn_factor_group_id
 
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
+| `pageTitle` | Text | `Conditional Currency Multipliers` | Page heading text (bindable) |
+| `pageDescription` | Text | `Configure reward multipliers...` | Page subtitle (bindable) |
 | `supabaseUrl` | Text | `https://wkevmsedchftztoolkmi.supabase.co` | Supabase project URL |
 | `supabaseAnonKey` | Text | *(hardcoded CRM anon key)* | Public API key |
 | `authToken` | Text | *(must bind)* | Admin user JWT |
@@ -194,7 +226,7 @@ m[g.id] = factors.map(f => ({ ...f, earn_factor_group_id: f.earn_factor_group_id
 | `rightColumnWidth` | Length | `580px` | Right column width |
 | `connectionLineColor` | Color | `#C9CCCF` | Default line color |
 | `connectionLineActiveColor` | Color | `#005BD3` | Hovered line color |
-| `configPanelWidth` | Length | `400px` | Sidebar panel width |
+| `configPanelWidth` | Length | `380px` | Sidebar panel width |
 
 ## Trigger Events
 
@@ -248,19 +280,22 @@ No page-level save. Each entity saves independently:
 
 ## Styling
 
-- Built on `polaris-weweb-styles` v2.2.0 (GitHub: `rangwan-rocket/polaris-weweb-styles`)
+- Built on `polaris-weweb-styles` (GitHub: `rangwan-rocket/polaris-weweb-styles`)
 - Uses Polaris design tokens: `--p-color-*`, `--p-space-*`, `--p-font-*`, `--p-border-radius-*`, `--p-shadow-*`
-- Uses Polaris mixins: `polaris-button-primary`, `polaris-button-plain`, `polaris-input`, `polaris-select`, `polaris-radio`, `polaris-spinner`, `polaris-text-title`, `polaris-text-subtitle`, `polaris-text-description`, `polaris-separator-dot`, `polaris-card-bordered`
+- Uses Polaris mixins: `polaris-button-primary`, `polaris-button-plain`, `polaris-input`, `polaris-select`, `polaris-radio`, `polaris-spinner`, `polaris-text-title`, `polaris-text-subtitle`, `polaris-text-description`, `polaris-separator-dot`, `polaris-card-bordered`, `polaris-segmented-pill`, `polaris-segmented-pill-btn`, `polaris-segmented-pill-btn-active`
 - Group colors: 8-color deterministic palette hashed by group ID
 - Inter font throughout matching Figma specs
 - Factor card icons: tag (rate), lightning bolt (multiplier)
 - Condition group icon: filter/lines (descending horizontal bars)
-- Condition detail table: pink item badges, clipboard threshold icons
+- Condition detail table: bordered 8px-radius container, pink item badges with eye icon, NoteIcon for threshold, `#EEEEEE` cell borders
+- Config panels: absolute positioning overlay with 30% opacity backdrop
 
 ---
 
 ## Figma References
 
 - Main layout: `figma.com/design/lje20iz4W3A92HJOt1diwb/New-CRM-Polaris?node-id=1104-17765`
-- Config sidebar: `figma.com/design/lje20iz4W3A92HJOt1diwb/New-CRM-Polaris?node-id=1089-79631`
-- Condition group detail: `figma.com/design/lje20iz4W3A92HJOt1diwb/New-CRM-Polaris?node-id=1089-86487`
+- Full page with header: `figma.com/design/lje20iz4W3A92HJOt1diwb/New-CRM-Polaris?node-id=1089-79631`
+- Config sidebar (factor): `figma.com/design/lje20iz4W3A92HJOt1diwb/New-CRM-Polaris?node-id=1093-144927`
+- Config sidebar (condition): `figma.com/design/lje20iz4W3A92HJOt1diwb/New-CRM-Polaris?node-id=1093-148193`
+- Condition group detail: `figma.com/design/lje20iz4W3A92HJOt1diwb/New-CRM-Polaris?node-id=1089-7932`
