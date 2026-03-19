@@ -414,7 +414,7 @@ export default {
   &__header { @include polaris-modal-header; }
   &__title { @include polaris-text-heading-sm; margin: 0; }
   &__close {
-    width: 32px; height: 32px;
+    width: var(--p-space-800); height: var(--p-space-800);
     display: flex; align-items: center; justify-content: center;
     background: transparent; border: none; border-radius: var(--p-border-radius-100);
     color: var(--p-color-icon); cursor: pointer;
@@ -486,7 +486,7 @@ export default {
   &__confirm-overlay {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.4);
+    background: var(--p-color-bg-backdrop, rgba(0, 0, 0, 0.4));
     z-index: var(--p-z-index-5);
     display: flex;
     align-items: center;
@@ -546,7 +546,7 @@ export default {
   }
 
   &__action-btn {
-    width: 24px; height: 24px;
+    width: var(--p-space-600); height: var(--p-space-600);
     display: flex; align-items: center; justify-content: center;
     background: transparent; border: none; border-radius: var(--p-border-radius-100);
     color: var(--p-color-icon); cursor: pointer;
@@ -639,7 +639,7 @@ export default {
     width: 28px; height: 28px;
     display: flex; align-items: center; justify-content: center;
     background: transparent; border: none; color: var(--p-color-icon); cursor: pointer;
-    font-size: 18px; /* TODO: verify Polaris token — no standard mapping for 18px */
+    font-size: 18px; /* TODO: verify Polaris token — 18px has no standard font-size token */
     &:hover { background: var(--p-color-bg-surface-hover); border-radius: var(--p-border-radius-100); }
   }
 

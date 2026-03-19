@@ -95,14 +95,8 @@ export default {
   setup(props) {
     const conditionCount = computed(() => props.conditions?.length || 0);
 
-    const iconColors = [
-      '#0262E0' /* --p-color-text-info */,
-      '#D82C0D' /* --p-color-text-critical */,
-      '#5E4200' /* --p-color-text-caution */,
-      '#29845A' /* --p-color-text-success */,
-      '#6D28D9' /* --p-color-text-magic */,
-      '#0D9488' /* teal palette */,
-    ];
+    // Polaris semantic palette: info, critical, caution, success, decorative-purple, decorative-teal
+    const iconColors = ['#0262E0', '#D82C0D', '#5E4200', '#29845A', '#6D28D9', '#0D9488'];
     const iconStyle = computed(() => {
       let hash = 0;
       const str = props.group?.id || '';
@@ -185,7 +179,7 @@ export default {
   }
 
   &__badge {
-    font-size: 10px; /* TODO: verify Polaris token — no standard mapping for 10px */
+    font-size: 10px; /* TODO: verify Polaris token — no standard token for 10px */
     font-weight: var(--p-font-weight-bold);
     color: var(--p-color-text-info);
     background: var(--p-color-bg-fill-brand-secondary);
@@ -198,7 +192,7 @@ export default {
     display: inline-flex;
     align-items: center;
     gap: var(--p-space-050);
-    font-size: 10px; /* TODO: verify Polaris token — no standard mapping for 10px */
+    font-size: 10px; /* TODO: verify Polaris token — no standard token for 10px */
     font-weight: var(--p-font-weight-medium);
     color: var(--p-color-text-info);
     background: var(--p-color-bg-fill-brand-secondary);
@@ -261,7 +255,7 @@ export default {
 
     th {
       padding: var(--p-space-100) var(--p-space-200);
-      font-size: 10px; /* TODO: verify Polaris token — no standard mapping for 10px */
+      font-size: 10px; /* TODO: verify Polaris token — no standard token for 10px */
       font-weight: var(--p-font-weight-bold);
       text-transform: uppercase;
       letter-spacing: 0.5px;
@@ -299,8 +293,8 @@ export default {
   }
 
   &__items-dot {
-    width: var(--p-space-150);
-    height: var(--p-space-150);
+    width: 6px;
+    height: 6px;
     border-radius: var(--p-border-radius-full);
     border: 1.5px solid var(--p-color-text-magic);
   }

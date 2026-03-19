@@ -99,7 +99,7 @@ export default {
   }
 
   &__close {
-    width: 24px; height: 24px;
+    width: var(--p-space-600); height: var(--p-space-600);
     display: flex; align-items: center; justify-content: center;
     background: transparent; border: none; color: var(--p-color-icon); cursor: pointer;
     font-size: var(--p-font-size-350);

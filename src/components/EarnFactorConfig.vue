@@ -226,7 +226,7 @@ export default {
   &__head { @include polaris-modal-header; }
   &__title { @include polaris-text-heading-sm; margin: 0; }
   &__x {
-    width: 32px; height: 32px;
+    width: var(--p-space-800); height: var(--p-space-800);
     display: flex; align-items: center; justify-content: center;
     background: transparent; border: none; border-radius: var(--p-border-radius-100);
     color: var(--p-color-icon); cursor: pointer;
@@ -290,7 +290,7 @@ export default {
   &__confirm-overlay {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.4);
+    background: var(--p-color-bg-backdrop, rgba(0, 0, 0, 0.4));
     z-index: var(--p-z-index-5);
     display: flex; align-items: center; justify-content: center;
   }
