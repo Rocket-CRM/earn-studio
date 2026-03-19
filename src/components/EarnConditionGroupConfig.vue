@@ -532,7 +532,6 @@ export default {
     justify-content: space-between;
     padding: var(--p-space-200) var(--p-space-300);
     background: var(--p-color-bg-surface-secondary);
-    border-bottom: 1px solid var(--p-color-border);
   }
 
   &__title {
