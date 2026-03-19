@@ -190,7 +190,7 @@ export default {
   &__link-badge {
     display: inline-flex;
     align-items: center;
-    gap: 2px;
+    gap: var(--p-space-050);
     font-size: 10px;
     font-weight: var(--p-font-weight-medium);
     color: var(--p-color-text-info);
@@ -287,7 +287,7 @@ export default {
     display: inline-flex;
     align-items: center;
     gap: 3px;
-    color: #DA3590;
+    color: var(--p-color-text-magic);
     font-weight: var(--p-font-weight-medium);
   }
 
@@ -295,7 +295,7 @@ export default {
     width: 6px;
     height: 6px;
     border-radius: var(--p-border-radius-full);
-    border: 1.5px solid #DA3590;
+    border: 1.5px solid var(--p-color-text-magic);
   }
 }
 

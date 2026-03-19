@@ -126,8 +126,8 @@ export default {
     height: 22px;
     min-width: 22px;
     border-radius: var(--p-border-radius-100);
-    background: #F54239;
-    color: #fff;
+    background: var(--p-color-bg-fill-critical);
+    color: var(--p-color-text-on-color);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -212,7 +212,7 @@ export default {
     width: 30px;
     height: 30px;
     min-width: 30px;
-    border-radius: 5px;
+    border-radius: var(--p-border-radius-100);
     border: 0.7px solid var(--p-color-border);
     display: flex;
     align-items: center;

@@ -217,8 +217,8 @@ export default {
   position: absolute;
   top: 0; right: 0; bottom: 0;
   background: var(--p-color-bg-surface);
-  box-shadow: -4px 0 16px rgba(0, 0, 0, 0.12);
-  z-index: 300;
+  box-shadow: var(--p-shadow-600);
+  z-index: var(--p-z-index-4);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -284,14 +284,14 @@ export default {
   &__btn {
     &--primary { @include polaris-button-primary; }
     &--secondary { @include polaris-button-default; }
-    &--danger { @include polaris-button-critical; gap: 6px; }
+    &--danger { @include polaris-button-critical; gap: var(--p-space-150); }
   }
 
   &__confirm-overlay {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
     background: rgba(0, 0, 0, 0.4);
-    z-index: 500;
+    z-index: var(--p-z-index-5);
     display: flex; align-items: center; justify-content: center;
   }
   &__confirm-modal {

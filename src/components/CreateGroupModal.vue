@@ -203,14 +203,14 @@ export default {
   &__btn-danger {
     @include polaris-button-critical;
     font-size: var(--p-font-size-350);
-    gap: 6px;
+    gap: var(--p-space-150);
   }
 
   &__confirm-overlay {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
     background: rgba(0, 0, 0, 0.4);
-    z-index: 500;
+    z-index: var(--p-z-index-5);
     display: flex;
     align-items: center;
     justify-content: center;

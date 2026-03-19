@@ -72,7 +72,7 @@ export default {
 .connect-popup-overlay {
   position: fixed;
   inset: 0;
-  z-index: 350;
+  z-index: var(--p-z-index-4);
 }
 
 .connect-popup {
@@ -102,7 +102,7 @@ export default {
     width: 24px; height: 24px;
     display: flex; align-items: center; justify-content: center;
     background: transparent; border: none; color: var(--p-color-icon); cursor: pointer;
-    font-size: 16px;
+    font-size: var(--p-space-400);
     border-radius: var(--p-border-radius-100);
     &:hover { background: var(--p-color-bg-surface-hover); }
   }
@@ -131,7 +131,7 @@ export default {
   &__item-info {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: var(--p-space-050);
     min-width: 0;
   }
 
