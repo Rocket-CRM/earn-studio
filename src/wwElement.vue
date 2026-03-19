@@ -304,22 +304,24 @@
           </div>
         </template>
 
-        <div v-if="!factorGroups?.length" class="es__empty">
-          <div class="es__empty-icon">
-            <svg width="24" height="24" viewBox="0 0 20 20" fill="none"><rect x="2" y="4" width="7" height="5" rx="1" fill="currentColor" opacity="0.6"/><rect x="2" y="11" width="7" height="5" rx="1" fill="currentColor" opacity="0.4"/><rect x="11" y="4" width="7" height="5" rx="1" fill="currentColor" opacity="0.3"/><rect x="11" y="11" width="7" height="5" rx="1" fill="currentColor" opacity="0.2"/></svg>
+        <div v-if="!factorGroups?.length" class="es__empty-wrap">
+          <div class="es__empty">
+            <div class="es__empty-icon">
+              <svg width="28" height="28" viewBox="0 0 20 20" fill="none"><rect x="2" y="4" width="7" height="5" rx="1" fill="currentColor" opacity="0.6"/><rect x="2" y="11" width="7" height="5" rx="1" fill="currentColor" opacity="0.4"/><rect x="11" y="4" width="7" height="5" rx="1" fill="currentColor" opacity="0.3"/><rect x="11" y="11" width="7" height="5" rx="1" fill="currentColor" opacity="0.2"/></svg>
+            </div>
+            <h3 class="es__empty-heading">No earn factor groups yet</h3>
+            <p class="es__empty-desc">Create your first earn factor group to start building conditional currency multipliers.</p>
+            <button class="es__empty-action" @click="openCreateFactorGroup()">
+              <svg width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              Create Earn Factor Group
+            </button>
           </div>
-          <h3 class="es__empty-heading">No earn factor groups yet</h3>
-          <p class="es__empty-desc">Create your first earn factor group to start building conditional currency multipliers.</p>
-          <button class="es__empty-action" @click="openCreateFactorGroup()">
-            <svg width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-            Create Earn Factor Group
-          </button>
         </div>
       </template>
 
       <svg class="es__svg" ref="svgRef">
         <path v-for="ln in lines" :key="ln.key" :d="ln.d" fill="none"
-          :stroke="hoveredLine === ln.key ? (content?.connectionLineActiveColor || '#005BD3') : (content?.connectionLineColor || '#C9CCCF')"
+          :stroke="hoveredLine === ln.key ? (content?.connectionLineActiveColor || CONNECTION_LINE_ACTIVE_COLOR) : (content?.connectionLineColor || CONNECTION_LINE_COLOR)"
           :stroke-width="hoveredLine === ln.key ? 2.5 : 1.5"
           @mouseenter="hoveredLine = ln.key" @mouseleave="hoveredLine = null" style="cursor:pointer" />
       </svg>
@@ -348,7 +350,19 @@ import EarnConditionGroupConfig from './components/EarnConditionGroupConfig.vue'
 import CreateGroupModal from './components/CreateGroupModal.vue';
 import ConnectPopup from './components/ConnectPopup.vue';
 
-const GROUP_COLORS = ['#2C6ECB', '#D82C0D', '#8A6116', '#29845A', '#6D28D9', '#0D9488', '#C05717', '#4F46E5'];
+const CONNECTION_LINE_COLOR = '#C9CCCF'; /* --p-color-border */
+const CONNECTION_LINE_ACTIVE_COLOR = '#005BD3'; /* --p-color-bg-fill-brand */
+
+const GROUP_COLORS = [
+  '#2C6ECB' /* --p-color-text-info */,
+  '#D82C0D' /* --p-color-text-critical */,
+  '#8A6116' /* --p-color-text-caution */,
+  '#29845A' /* --p-color-text-success */,
+  '#6D28D9' /* --p-color-text-magic */,
+  '#0D9488' /* teal palette */,
+  '#C05717' /* --p-color-text-warning */,
+  '#4F46E5' /* indigo palette */,
+];
 const ENTITY_LABELS = { product_product: 'Product', product_sku: 'SKU', product_brand: 'Brand', product_category: 'Category', store: 'Store', store_attribute_set: 'Store Attr', tier: 'Tier', persona: 'Persona' };
 const THRESHOLD_LABELS = { purchase_amount: 'Purchase amount', purchase_quantity: 'Purchase qty', purchase_count: 'Purchase count', amount: 'Amount', quantity_primary: 'Qty (primary)', quantity_secondary: 'Qty (secondary)' };
 const PRODUCT_ENTITIES = new Set(['product_product', 'product_sku', 'product_brand', 'product_category']);
@@ -695,6 +709,7 @@ export default {
       openCreateFactorGroup, openCreateConditionGroup, handleModalSave,
       saveFactorConfig, saveCondGroupConfig, handleConnectSelect,
       handleDeleteFactor, handleDeleteFactorGroup, handleDeleteCondGroup,
+      CONNECTION_LINE_COLOR, CONNECTION_LINE_ACTIVE_COLOR,
       scheduleLineUpdate, retryLoad, refreshData: loadAll, closePanel: () => { panel.value = null; },
     };
   },
@@ -840,7 +855,7 @@ $right-width: 520px;
   }
   &__page-header-left { flex-shrink: 0; }
   &__page-title {
-    font-size: var(--p-space-500); font-weight: var(--p-font-weight-semibold);
+    font-size: var(--p-font-size-400); font-weight: var(--p-font-weight-semibold);
     color: var(--p-color-text); margin: 0 0 var(--p-space-100); line-height: 1.3;
   }
   &__page-desc {
@@ -876,7 +891,7 @@ $right-width: 520px;
   &__layout { display: flex; flex-direction: column; position: relative; }
   &__header-row { display: flex; justify-content: space-between; padding-bottom: var(--p-space-300); }
   &__col-label {
-    font-size: 11px; font-weight: 600; letter-spacing: 0.8px;
+    font-size: var(--p-font-size-275); font-weight: 600; letter-spacing: 0.8px;
     text-transform: uppercase; color: var(--p-color-text-secondary);
     &--left { width: $left-width; flex-shrink: 0; }
     &--right { width: $right-width; flex-shrink: 0; }
@@ -904,7 +919,7 @@ $right-width: 520px;
   }
   &__create-menu-item {
     display: flex; align-items: center; gap: var(--p-space-200);
-    padding: var(--p-space-250) 14px; width: 100%;
+    padding: var(--p-space-250) var(--p-space-300); width: 100%;
     font-family: var(--p-font-family-sans); font-size: var(--p-font-size-300);
     color: var(--p-color-text); background: none; border: none;
     cursor: pointer; text-align: left;
@@ -1144,28 +1159,33 @@ $right-width: 520px;
   &__divider {
     display: flex; align-items: center; gap: var(--p-space-300);
     padding: var(--p-space-400) 0;
-    span { font-size: 10px; font-weight: var(--p-font-weight-semibold); color: var(--p-color-text-disabled); text-transform: uppercase; letter-spacing: 1px; }
+    span { font-size: 10px; /* TODO: verify Polaris token — no standard mapping for 10px */ font-weight: var(--p-font-weight-semibold); color: var(--p-color-text-disabled); text-transform: uppercase; letter-spacing: 1px; }
     &::after { content: ''; flex: 1; height: var(--p-space-050); background: var(--p-color-bg-surface-tertiary); border-radius: 1px; }
   }
 
   &__loading { display: flex; justify-content: center; padding: var(--p-space-1200) 0; }
   &__spinner { @include polaris-spinner; }
+  &__empty-wrap {
+    min-height: 320px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--p-color-bg-surface);
+    border: 1px solid var(--p-color-border);
+    border-radius: var(--p-border-radius-300);
+  }
   &__empty {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 280px;
-    padding: var(--p-space-800) var(--p-space-400);
-    background: var(--p-color-bg-surface);
-    border: 1px solid var(--p-color-border);
-    border-radius: var(--p-border-radius-300);
+    padding: var(--p-space-800) var(--p-space-600);
     text-align: center;
   }
   &__empty-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: var(--p-border-radius-200);
+    width: 56px;
+    height: 56px;
+    border-radius: var(--p-border-radius-300);
     background: var(--p-color-bg-surface-secondary);
     display: flex;
     align-items: center;
@@ -1182,8 +1202,8 @@ $right-width: 520px;
   &__empty-desc {
     font-size: var(--p-font-size-300);
     color: var(--p-color-text-secondary);
-    margin: 0 0 var(--p-space-400);
-    max-width: 360px;
+    margin: 0 0 var(--p-space-500);
+    max-width: 380px;
     line-height: 1.5;
   }
   &__empty-action {

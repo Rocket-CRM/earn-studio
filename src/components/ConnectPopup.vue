@@ -102,7 +102,7 @@ export default {
     width: 24px; height: 24px;
     display: flex; align-items: center; justify-content: center;
     background: transparent; border: none; color: var(--p-color-icon); cursor: pointer;
-    font-size: var(--p-space-400);
+    font-size: var(--p-font-size-350);
     border-radius: var(--p-border-radius-100);
     &:hover { background: var(--p-color-bg-surface-hover); }
   }

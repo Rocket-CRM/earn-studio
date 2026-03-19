@@ -146,7 +146,7 @@ export default {
     @include polaris-button-plain;
     font-size: var(--p-font-size-300);
     white-space: nowrap;
-    padding: 2px 6px;
+    padding: var(--p-space-050) var(--p-space-150);
     min-height: auto;
   }
 

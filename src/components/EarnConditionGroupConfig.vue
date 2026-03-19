@@ -580,9 +580,9 @@ export default {
     border: none;
     color: inherit;
     cursor: pointer;
-    font-size: 14px;
+    font-size: var(--p-font-size-325);
     line-height: 1;
-    padding: 0 2px;
+    padding: 0 var(--p-space-050);
     opacity: 0.7;
     &:hover { opacity: 1; }
   }
@@ -639,7 +639,7 @@ export default {
     width: 28px; height: 28px;
     display: flex; align-items: center; justify-content: center;
     background: transparent; border: none; color: var(--p-color-icon); cursor: pointer;
-    font-size: 18px;
+    font-size: 18px; /* TODO: verify Polaris token — no standard mapping for 18px */
     &:hover { background: var(--p-color-bg-surface-hover); border-radius: var(--p-border-radius-100); }
   }
 
