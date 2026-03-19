@@ -15,6 +15,19 @@
       </div>
     </div>
 
+    <!-- ═══ ERROR BANNER ═══ -->
+    <div v-if="loadError" class="es__error-banner">
+      <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M10 6v5M10 13.5h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <div class="es__error-banner-content">
+        <strong>Failed to load data</strong>
+        <span>{{ loadError }}</span>
+      </div>
+      <button class="es__error-banner-action" @click="retryLoad">Retry</button>
+      <button class="es__error-banner-dismiss" @click="loadError = null">
+        <svg width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M6 6l8 8M14 6l-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+
     <div class="es__scroll-area">
     <div class="es__page-header">
       <div class="es__page-header-left">
@@ -296,7 +309,7 @@
 
       <svg class="es__svg" ref="svgRef">
         <path v-for="ln in lines" :key="ln.key" :d="ln.d" fill="none"
-          :stroke="hoveredLine === ln.key ? '#0262E0' : '#CCCCCC'"
+          :stroke="hoveredLine === ln.key ? (content?.connectionLineActiveColor || '#005BD3') : (content?.connectionLineColor || '#C9CCCF')"
           :stroke-width="hoveredLine === ln.key ? 2.5 : 1.5"
           @mouseenter="hoveredLine = ln.key" @mouseleave="hoveredLine = null" style="cursor:pointer" />
       </svg>
@@ -372,6 +385,7 @@ export default {
     const filterFactorType = ref('');
     const createMenuOpen = ref(false);
     const toasts = ref([]);
+    const loadError = ref(null);
     let lineTimer = null, ro = null;
 
     function addToast(type, title, message) {
@@ -463,6 +477,7 @@ export default {
     });
 
     async function loadAll() {
+      loadError.value = null;
       await Promise.all([loadFactorGroups(), loadCondGroups(), loadEntities(), loadTicketTypes()]);
       emit('trigger-event', { name: 'data-loaded', event: { factorGroupCount: factorGroups.value?.length, conditionGroupCount: allCondGroups.value?.length } });
       scheduleLineUpdate(); setTimeout(scheduleLineUpdate, 300); setTimeout(scheduleLineUpdate, 800);
@@ -474,16 +489,17 @@ export default {
         const m = {};
         for (const g of factorGroups.value) { if (!g?.id) continue; const factors = await api.fetchFactorsByGroup(g.id) || []; m[g.id] = factors.map(f => ({ ...f, earn_factor_group_id: f.earn_factor_group_id || g.id })); }
         factorsByGroup.value = m;
-      } catch (e) { errMsg('Load failed', e); } finally { loadingFactorGroups.value = false; }
+      } catch (e) { loadError.value = e?.message || 'Failed to load earn factor groups'; errMsg('Load failed', e); } finally { loadingFactorGroups.value = false; }
     }
     async function loadCondGroups() {
       loadingConditionGroups.value = true;
       try { allCondGroups.value = await api.fetchAllConditionGroups() || []; const c = {}; for (const g of allCondGroups.value) { if (g?.id) try { c[g.id] = await api.fetchConditionGroupDetails(g.id); } catch {} } condCache.value = c; }
-      catch (e) { errMsg('Load failed', e); } finally { loadingConditionGroups.value = false; }
+      catch (e) { loadError.value = e?.message || 'Failed to load condition groups'; errMsg('Load failed', e); } finally { loadingConditionGroups.value = false; }
     }
     async function loadEntities() { try { entityOptions.value = await api.fetchEntityOptions() || []; } catch (e) { errMsg('Load failed', e); } }
     async function loadTicketTypes() { try { ticketTypes.value = await api.fetchTicketTypes() || []; } catch (e) { console.warn('Ticket types load failed', e); } }
     function errMsg(m, e) { console.error(m, e); emit('trigger-event', { name: 'error', event: { message: m, code: 'ERR' } }); }
+    function retryLoad() { loadError.value = null; loadAll(); }
 
     function scheduleLineUpdate() { clearTimeout(lineTimer); lineTimer = setTimeout(() => nextTick(rebuildLines), 150); }
 
@@ -653,7 +669,7 @@ export default {
     return {
       rootRef, layoutRef, svgRef, content: computed(() => props.content),
       factorGroups, allCondGroups, entityOptions, ticketTypes,
-      loadingFactorGroups, loadingConditionGroups, expandedConds,
+      loadingFactorGroups, loadingConditionGroups, loadError, expandedConds,
       searchFactorGroup, searchCondGroup, filterFactorType,
       createMenuOpen, toasts,
       panel, editingFactor, editingGroupId, editingCondGroup, editingFactorGroupData,
@@ -669,7 +685,7 @@ export default {
       openCreateFactorGroup, openCreateConditionGroup, handleModalSave,
       saveFactorConfig, saveCondGroupConfig, handleConnectSelect,
       handleDeleteFactor, handleDeleteFactorGroup, handleDeleteCondGroup,
-      scheduleLineUpdate, refreshData: loadAll, closePanel: () => { panel.value = null; },
+      scheduleLineUpdate, retryLoad, refreshData: loadAll, closePanel: () => { panel.value = null; },
     };
   },
 };
@@ -687,7 +703,7 @@ $right-width: 520px;
   @include polaris-tokens;
   font-family: var(--p-font-family-sans);
   color: var(--p-color-text);
-  background: #F8FAFC;
+  background: var(--p-color-bg-surface-secondary);
   width: 100%; height: 100%;
   position: relative;
   overflow: hidden;
@@ -707,14 +723,14 @@ $right-width: 520px;
   &__toast {
     pointer-events: auto;
     border-radius: var(--p-border-radius-200);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.16);
+    box-shadow: var(--p-shadow-400);
     overflow: hidden;
     animation: es-toast-in 0.25s ease-out;
 
     &--success {
       .es__toast-header {
-        background: #1A1A1A;
-        color: #fff;
+        background: var(--p-color-bg-fill-inverse);
+        color: var(--p-color-text-on-color);
       }
       .es__toast-body {
         background: var(--p-color-bg-surface);
@@ -724,7 +740,7 @@ $right-width: 520px;
     &--error {
       .es__toast-header {
         background: var(--p-color-bg-fill-critical);
-        color: #fff;
+        color: var(--p-color-text-on-color);
       }
       .es__toast-body {
         background: var(--p-color-bg-surface);
@@ -760,6 +776,45 @@ $right-width: 520px;
     to { opacity: 1; transform: translateX(0); }
   }
 
+  // ═══ ERROR BANNER ═══
+  &__error-banner {
+    @include polaris-banner-critical;
+    margin: var(--p-space-400) var(--p-space-600) 0;
+    display: flex;
+    align-items: flex-start;
+    gap: var(--p-space-200);
+    padding: var(--p-space-300) var(--p-space-400);
+    border-radius: var(--p-border-radius-200);
+    background: var(--p-color-bg-surface-critical);
+    border: 1px solid var(--p-color-border-critical);
+    color: var(--p-color-text-critical);
+    font-size: var(--p-font-size-300);
+    line-height: 1.4;
+    > svg { flex-shrink: 0; margin-top: 2px; }
+  }
+  &__error-banner-content {
+    flex: 1; min-width: 0;
+    strong { display: block; font-weight: var(--p-font-weight-semibold); margin-bottom: var(--p-space-050); }
+    span { color: var(--p-color-text-secondary); }
+  }
+  &__error-banner-action {
+    @include polaris-button-plain;
+    font-size: var(--p-font-size-300);
+    font-weight: var(--p-font-weight-semibold);
+    color: var(--p-color-text-critical);
+    white-space: nowrap;
+    flex-shrink: 0;
+    &:hover { text-decoration: underline; }
+  }
+  &__error-banner-dismiss {
+    width: 24px; height: 24px; min-width: 24px;
+    display: flex; align-items: center; justify-content: center;
+    background: none; border: none; border-radius: var(--p-border-radius-100);
+    color: var(--p-color-text-critical); cursor: pointer; flex-shrink: 0;
+    opacity: 0.7;
+    &:hover { opacity: 1; background: var(--p-color-bg-surface-critical-hover); }
+  }
+
   &__scroll-area {
     width: 100%; height: 100%;
     overflow: auto;
@@ -769,10 +824,9 @@ $right-width: 520px;
 
   &__page-header {
     display: flex; align-items: flex-start; justify-content: space-between;
-    padding: var(--p-space-500) 0 var(--p-space-400);
+    padding: var(--p-space-500) 0 var(--p-space-500);
     gap: 24px;
-    border-bottom: 1px solid var(--p-color-border);
-    margin-bottom: var(--p-space-300);
+    margin-bottom: var(--p-space-400);
   }
   &__page-header-left { flex-shrink: 0; }
   &__page-title {
@@ -871,7 +925,7 @@ $right-width: 520px;
     transition: box-shadow 0.15s, border-width 0.15s;
     &:hover {
       border-width: 1.5px;
-      box-shadow: 0 1px 6px 0 rgba(0, 0, 0, 0.1);
+      box-shadow: var(--p-shadow-200);
       .es__sidebar-action { opacity: 0.7; }
     }
   }
@@ -932,7 +986,7 @@ $right-width: 520px;
     border-radius: var(--p-border-radius-200);
     box-shadow: var(--p-shadow-card-sm);
     overflow: visible; transition: box-shadow 0.15s, border-color 0.15s, border-width 0.15s;
-    &:hover { border-width: 1.5px; box-shadow: 0 1px 6px 0 rgba(0, 0, 0, 0.1); .es__card-edit { opacity: 1; } .es__card-connect { opacity: 1; } }
+    &:hover { border-width: 1.5px; box-shadow: var(--p-shadow-200); .es__card-edit { opacity: 1; } .es__card-connect { opacity: 1; } }
     &--factor { }
     &--condition { padding-left: var(--p-space-300); width: 100%; cursor: pointer; }
     &--dim { opacity: 0.6; border-color: var(--p-color-border); box-shadow: none; &:hover { opacity: 1; border-color: var(--p-color-border-info); } }
@@ -942,16 +996,16 @@ $right-width: 520px;
   &__card-dot-indicator {
     position: absolute; left: -7px; top: 30px; transform: translateY(-50%);
     width: 10px; height: 10px; border-radius: 50%;
-    background: var(--p-color-border-info); border: 2px solid #F8FAFC; z-index: 3;
+    background: var(--p-color-border-info); border: 2px solid var(--p-color-bg-surface-secondary); z-index: 3;
   }
   &__card-body { flex: 1; display: flex; align-items: center; gap: var(--p-space-200); padding: 0 var(--p-space-300); min-width: 0; }
   &__card-icon {
-    width: 28px; height: 28px; min-width: 28px; border-radius: 5px;
+    width: 28px; height: 28px; min-width: 28px; border-radius: var(--p-border-radius-100);
     border: 0.7px solid var(--p-color-border); display: flex; align-items: center; justify-content: center;
     &--points { color: var(--p-color-text-info); }
     &--credit { color: var(--p-color-text); }
   }
-  &__cg-icon { width: 28px; height: 28px; min-width: 28px; border-radius: 5px; display: flex; align-items: center; justify-content: center; }
+  &__cg-icon { width: 28px; height: 28px; min-width: 28px; border-radius: var(--p-border-radius-100); display: flex; align-items: center; justify-content: center; }
   &__card-info { flex: 1; min-width: 0; }
   &__card-name { font-size: var(--p-font-size-325); font-weight: var(--p-font-weight-semibold); color: var(--p-color-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   &__card-sub { font-size: var(--p-font-size-275); color: var(--p-color-text-secondary); display: flex; align-items: center; gap: 6px; white-space: nowrap; }
@@ -974,8 +1028,8 @@ $right-width: 520px;
   &__card-connect {
     position: absolute; right: -15px; top: 50%; transform: translateY(-50%);
     width: 28px; height: 28px; border-radius: 50%;
-    background: var(--p-color-bg-fill-brand); color: #fff;
-    border: 3px solid #F8FAFC; display: flex; align-items: center; justify-content: center;
+    background: var(--p-color-bg-fill-brand); color: var(--p-color-text-on-color);
+    border: 3px solid var(--p-color-bg-surface-secondary); display: flex; align-items: center; justify-content: center;
     cursor: pointer; opacity: 0; z-index: 5; box-shadow: var(--p-shadow-button);
     transition: opacity 0.1s, background 0.1s, transform 0.1s;
     &:hover { background: var(--p-color-bg-fill-brand-hover); transform: translateY(-50%) scale(1.1); }
@@ -986,7 +1040,7 @@ $right-width: 520px;
   &__linked-badge {
     display: inline-flex; align-items: center; gap: 4px;
     padding: 2px 8px 2px 5px; border-radius: 12px;
-    background: #E3F1FE; color: #2C6ECB;
+    background: var(--p-color-bg-fill-info-secondary); color: var(--p-color-text-info);
     font-size: 12px; font-weight: var(--p-font-weight-semibold);
     svg { flex-shrink: 0; }
   }
@@ -1002,7 +1056,7 @@ $right-width: 520px;
     width: 28px; height: 28px; min-width: 28px;
     display: flex; align-items: center; justify-content: center;
     background: var(--p-color-bg-surface); border: 1px solid var(--p-color-border);
-    border-radius: 8px; cursor: pointer; flex-shrink: 0;
+    border-radius: var(--p-border-radius-200); cursor: pointer; flex-shrink: 0;
     color: var(--p-color-icon); transition: background 0.1s;
     svg { transform: rotate(180deg); transition: transform 0.2s; }
     &--open svg { transform: rotate(0deg); }
@@ -1022,8 +1076,8 @@ $right-width: 520px;
   &__cond-detail { padding: 0 14px 14px; }
 
   &__cond-table-wrap {
-    border: 1px solid #EBEDEF;
-    border-radius: 8px;
+    border: 1px solid var(--p-color-border);
+    border-radius: var(--p-border-radius-200);
     overflow: hidden;
   }
 
@@ -1040,29 +1094,29 @@ $right-width: 520px;
     th {
       text-align: center; padding: 4px 0;
       font-weight: 400;
-      color: #1E2021; font-size: 12px;
-      background: #F8FAFC;
-      border-bottom: 1px solid #EEEEEE;
+      color: var(--p-color-text); font-size: 12px;
+      background: var(--p-color-bg-surface-secondary);
+      border-bottom: 1px solid var(--p-color-border);
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
       &:first-child { border-left: none; }
       &:last-child { border-right: none; }
     }
-    th + th { border-left: 1px solid #EEEEEE; }
+    th + th { border-left: 1px solid var(--p-color-border); }
     td {
       text-align: center; padding: 6px 0;
-      border-bottom: 1px solid #EEEEEE;
-      color: #1E2021; font-size: 12px;
+      border-bottom: 1px solid var(--p-color-border);
+      color: var(--p-color-text); font-size: 12px;
       vertical-align: middle;
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
-    td + td { border-left: 1px solid #EEEEEE; }
+    td + td { border-left: 1px solid var(--p-color-border); }
     tr:last-child td { border-bottom: none; }
   }
 
   &__items-badge {
     display: inline-flex; align-items: center; gap: 4px;
     padding: 2px 8px; border-radius: 8px;
-    background: #F7E6EF; color: #DA3590;
+    background: var(--p-color-bg-fill-magic-secondary); color: var(--p-color-text-magic);
     font-size: 12px; font-weight: 500;
     height: 20px; box-sizing: border-box;
     line-height: 1;
@@ -1073,15 +1127,15 @@ $right-width: 520px;
     display: inline-flex; align-items: center; justify-content: center; gap: 4px;
     width: 100%; padding: 0 12px; box-sizing: border-box;
     span { white-space: nowrap; }
-    svg { color: #B5B5B5; flex-shrink: 0; }
+    svg { color: var(--p-color-icon-secondary); flex-shrink: 0; }
   }
 
   // ─── Divider ───
   &__divider {
-    display: flex; align-items: center; gap: var(--p-space-200);
-    padding: var(--p-space-200) 0;
+    display: flex; align-items: center; gap: var(--p-space-300);
+    padding: var(--p-space-400) 0;
     span { font-size: 10px; font-weight: var(--p-font-weight-semibold); color: var(--p-color-text-disabled); text-transform: uppercase; letter-spacing: 1px; }
-    &::after { content: ''; flex: 1; height: 1px; background: var(--p-color-border); }
+    &::after { content: ''; flex: 1; height: 2px; background: var(--p-color-bg-surface-tertiary); border-radius: 1px; }
   }
 
   &__loading { display: flex; justify-content: center; padding: var(--p-space-1200) 0; }
