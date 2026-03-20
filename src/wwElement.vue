@@ -851,13 +851,13 @@ $right-width: 520px;
     display: flex; align-items: center; gap: var(--p-space-200);
   }
   &__search-input {
-    width: 200px; min-height: var(--p-space-800);
-    padding: var(--p-space-150) var(--p-space-250) var(--p-space-150) var(--p-space-800);
+    width: 220px; min-height: var(--p-space-800);
+    padding: var(--p-space-150) var(--p-space-300) var(--p-space-150) 36px;
     font-family: var(--p-font-family-sans); font-size: var(--p-font-size-300);
     color: var(--p-color-text); background: var(--p-color-bg-surface);
     border: 1px solid var(--p-color-border); border-radius: var(--p-border-radius-200);
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath fill='%235c5f62' d='M8 12a4 4 0 1 1 0-8 4 4 0 0 1 0 8m9.707 4.293-4.82-4.82A5.968 5.968 0 0 0 14 8 6 6 0 0 0 2 8a6 6 0 0 0 6 6 5.968 5.968 0 0 0 3.473-1.113l4.82 4.82a.997.997 0 0 0 1.414 0 .999.999 0 0 0 0-1.414'/%3E%3C/svg%3E");
-    background-repeat: no-repeat; background-position: var(--p-space-200) center; background-size: var(--p-space-400);
+    background-repeat: no-repeat; background-position: 10px center; background-size: 16px;
     &::placeholder { color: var(--p-color-text-secondary); }
     &:focus { outline: none; border-color: var(--p-color-focus-ring); box-shadow: 0 0 0 1px var(--p-color-focus-ring); }
   }
