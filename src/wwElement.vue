@@ -829,6 +829,7 @@ $right-width: 520px;
     overflow: auto;
     padding: 0 var(--p-space-600) 64px;
     position: relative;
+    z-index: 0;
   }
 
   &__page-header {
